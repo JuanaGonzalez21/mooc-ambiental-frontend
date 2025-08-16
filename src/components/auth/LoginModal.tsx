@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { X, Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { apiRequest } from '@/lib/config';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface LoginModalProps {
 }
 
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitchToRegister }) => {
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -75,13 +77,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitchToRegi
       if (data.success && data.token && data.user) {
         setConnectionStatus('success');
         
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('authToken', data.token);
-          localStorage.setItem('user', JSON.stringify(data.user));
-          
-          if (formData.remember) {
-            localStorage.setItem('rememberUser', 'true');
-          }
+        // Usar el contexto de autenticación
+        login(data.user, data.token);
+        
+        if (formData.remember && typeof window !== 'undefined') {
+          localStorage.setItem('rememberUser', 'true');
         }
         
         console.log('✅ Login exitoso, redirigiendo al dashboard');
@@ -138,8 +138,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitchToRegi
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-opacity-80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[95vh] overflow-y-aut">
         <div className="flex items-center justify-between p-6">
           <div>
             <h2 className="text-xl font-bold text-gray-900">Iniciar Sesión</h2>

@@ -9,9 +9,7 @@ import Footer from '@/components/layout/Footer';
 import { 
   Clock, 
   BookOpen, 
-  PlayCircle, 
   CheckCircle, 
-  Users,
   ChevronRight,
   Lock,
   Play
@@ -31,12 +29,12 @@ const CourseContentPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Datos de módulos del curso (esto vendría de la BD en el futuro)
+  // Datos de mÃ³dulos del curso (esto vendrÃ­a de la BD en el futuro)
   const courseModules = [
     {
       id: 1,
-      title: 'Introducción al Cambio Climático',
-      description: 'Conceptos fundamentales sobre el cambio climático y sus causas.',
+      title: 'Introducciónn al Cambio ClimÃ¡tico',
+      description: 'Conceptos fundamentales sobre el cambio climÃ¡tico y sus causas.',
       duration: '2 horas',
       lessons: 8,
       isLocked: false,
@@ -45,7 +43,7 @@ const CourseContentPage = () => {
     {
       id: 2,
       title: 'Impactos Ambientales',
-      description: 'Análisis de los efectos del cambio climático en ecosistemas.',
+      description: 'AnÃ¡lisis de los efectos del cambio climÃ¡tico en ecosistemas.',
       duration: '3 horas',
       lessons: 12,
       isLocked: !isEnrolled,
@@ -53,8 +51,8 @@ const CourseContentPage = () => {
     },
     {
       id: 3,
-      title: 'Energías Renovables',
-      description: 'Tecnologías limpias y fuentes de energía sostenible.',
+      title: 'EnergÃ­as Renovables',
+      description: 'TecnologÃ­as limpias y fuentes de energÃ­a sostenible.',
       duration: '4 horas',
       lessons: 15,
       isLocked: !isEnrolled,
@@ -62,8 +60,8 @@ const CourseContentPage = () => {
     },
     {
       id: 4,
-      title: 'Políticas Ambientales',
-      description: 'Marco regulatorio y políticas públicas ambientales.',
+      title: 'PolÃ­ticas Ambientales',
+      description: 'Marco regulatorio y polÃ­ticas pÃºblicas ambientales.',
       duration: '3 horas',
       lessons: 10,
       isLocked: !isEnrolled,
@@ -93,11 +91,11 @@ const CourseContentPage = () => {
           try {
             courseData = await getCourseByNameFromAPI(courseName);
           } catch (err) {
-            console.warn('No se pudo cargar por nombre, intentando por ID');
+            console.warn('No se pudo cargar por nombre, intentando por ID:', err);
           }
         }
         
-        // Si no se encontró por nombre, intentar por ID
+        // Si no se encontrÃ³ por nombre, intentar por ID
         if (!courseData && courseId) {
           courseData = await getCourseFromAPI(courseId);
         }
@@ -107,7 +105,7 @@ const CourseContentPage = () => {
           return;
         }
         
-        // Verificar que el curso coincida con los parámetros
+        // Verificar que el curso coincida con los parÃ¡metros
         if (courseName && courseData.nameRoute !== courseName) {
           setError('El curso no coincide con la ruta solicitada');
           return;
@@ -115,7 +113,7 @@ const CourseContentPage = () => {
         
         setCourse(courseData);
         
-        // Verificar si el usuario está inscrito
+        // Verificar si el usuario estÃ¡ inscrito
         const user = localStorage.getItem('user');
         if (user) {
           setIsEnrolled(true);
@@ -133,7 +131,7 @@ const CourseContentPage = () => {
   }, [courseId, courseName]);
 
   const handleEnroll = () => {
-    // Redirigir a la página de detalle para registro
+    // Redirigir a la pÃ¡gina de detalle para registro
     window.location.href = `/cursos/${courseId}`;
   };
 
@@ -185,7 +183,7 @@ const CourseContentPage = () => {
               {error || 'Curso no encontrado'}
             </h1>
             <p className="text-gray-600 mb-8">
-              El curso que buscas no está disponible o ha ocurrido un error.
+              El curso que buscas no estÃ¡ disponible o ha ocurrido un error.
             </p>
             <Link 
               href="/cursos"
@@ -220,75 +218,6 @@ const CourseContentPage = () => {
         </div>
       </div>
 
-      {/* Course Header */}
-      <section className="bg-gradient-to-r from-green-900 to-blue-900 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
-            <div className="lg:col-span-2">
-              <h1 className="text-4xl font-bold text-white mb-4">
-                {course.title}
-              </h1>
-              <p className="text-xl text-green-100 mb-6">
-                {course.description}
-              </p>
-              
-              <div className="flex items-center space-x-6 text-green-100 mb-6">
-                <div className="flex items-center">
-                  <Clock className="h-5 w-5 mr-2" />
-                  {course.duration}
-                </div>
-                <div className="flex items-center">
-                  <BookOpen className="h-5 w-5 mr-2" />
-                  {courseModules.length} módulos
-                </div>
-                <div className="flex items-center">
-                  <Users className="h-5 w-5 mr-2" />
-                  {course.students.toLocaleString()} estudiantes
-                </div>
-              </div>
-
-              {!isEnrolled && (
-                <button
-                  onClick={handleEnroll}
-                  className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-colors inline-flex items-center"
-                >
-                  <PlayCircle className="h-6 w-6 mr-3" />
-                  Inscribirse al curso
-                </button>
-              )}
-            </div>
-            
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-xl shadow-lg p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">
-                  Información del curso
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Instructor:</span>
-                    <span className="font-medium">{course.instructor}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Nivel:</span>
-                    <span className="font-medium">{course.level}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Calificación:</span>
-                    <span className="font-medium">⭐ {course.rating}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Progreso:</span>
-                    <span className="font-medium">
-                      {completedModules.length}/{courseModules.length} módulos
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Course Content */}
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -298,7 +227,7 @@ const CourseContentPage = () => {
             <div className="lg:col-span-1">
               <div className="bg-white rounded-xl shadow-lg p-6 sticky top-8">
                 <h3 className="text-xl font-bold text-gray-900 mb-6">
-                  Módulos del curso
+                  MÃ³dulos del curso
                 </h3>
                 
                 <div className="space-y-3">
@@ -325,7 +254,7 @@ const CourseContentPage = () => {
                               <Play className="h-5 w-5 text-blue-500 mr-2" />
                             )}
                             <span className="text-sm font-medium text-gray-900">
-                              Módulo {moduleItem.id}
+                              MÃ³dulo {moduleItem.id}
                             </span>
                           </div>
                           <h4 className={`font-semibold mb-1 ${
@@ -341,7 +270,7 @@ const CourseContentPage = () => {
                           <div className="flex items-center text-xs text-gray-500">
                             <Clock className="h-3 w-3 mr-1" />
                             {moduleItem.duration}
-                            <span className="mx-2">•</span>
+                            <span className="mx-2">â€¢</span>
                             <BookOpen className="h-3 w-3 mr-1" />
                             {moduleItem.lessons} lecciones
                           </div>
@@ -380,20 +309,20 @@ const CourseContentPage = () => {
                     <div className="space-y-6">
                       <div className="bg-gray-50 rounded-lg p-6">
                         <h3 className="text-lg font-semibold mb-4">
-                          Contenido del módulo
+                          Contenido del mÃ³dulo
                         </h3>
                         <p className="text-gray-600 mb-4">
-                          Aquí se mostraría el contenido específico del módulo seleccionado. 
-                          Esto incluiría videos, textos, ejercicios interactivos y recursos adicionales.
+                          AquÃ­ se mostrarÃ­a el contenido especÃ­fico del mÃ³dulo seleccionado. 
+                          Esto incluirÃ­a videos, textos, ejercicios interactivos y recursos adicionales.
                         </p>
                         
                         {!isEnrolled && courseModules[activeModule].preview && (
                           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
                             <p className="text-blue-800 font-medium">
-                              🎯 Esta es una vista previa gratuita del módulo.
+                              ðŸŽ¯ Esta es una vista previa gratuita del mÃ³dulo.
                             </p>
                             <p className="text-blue-700 text-sm mt-1">
-                              Inscríbete para acceder a todo el contenido del curso.
+                              InscrÃ­bete para acceder a todo el contenido del curso.
                             </p>
                           </div>
                         )}
@@ -408,7 +337,7 @@ const CourseContentPage = () => {
                           {Array.from({ length: courseModules[activeModule].lessons }, (_, i) => (
                             <div key={i} className="flex items-center p-3 bg-white rounded border">
                               <Play className="h-4 w-4 text-blue-500 mr-3" />
-                              <span className="flex-1">Lección {i + 1}: Contenido del módulo</span>
+                              <span className="flex-1">LecciÃ³n {i + 1}: Contenido del mÃ³dulo</span>
                               <span className="text-sm text-gray-500">5-10 min</span>
                             </div>
                           ))}
@@ -423,7 +352,7 @@ const CourseContentPage = () => {
                       Contenido bloqueado
                     </h3>
                     <p className="text-gray-600 mb-6">
-                      Inscríbete al curso para acceder a este módulo y todo el contenido.
+                      InscrÃ­bete al curso para acceder a este mÃ³dulo y todo el contenido.
                     </p>
                     <button
                       onClick={handleEnroll}

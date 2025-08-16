@@ -1,5 +1,7 @@
 // src/components/sections/HeroSection.tsx
 import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 
 const HeroSection = () => {
   return (
@@ -8,27 +10,30 @@ const HeroSection = () => {
         <div className="lg:grid lg:grid-cols-2 lg:gap-8 items-center">
           <div>
             <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl lg:text-6xl">
-              Aprende nuevas habilidades
+              Transforma el futuro
               <br />
-              <span className="text-gray-700">con nuestros cursos online</span>
+              <span className="text-blue-700">con educación ambiental</span>
             </h1>
             <p className="mt-6 text-xl text-gray-600 max-w-3xl">
-              Accede a más de 1,000 cursos de alta calidad impartidos por 
-              expertos en diversas áreas. Aprende a tu propio ritmo y desde 
-              cualquier lugar.
+              Descubre cursos en medio ambiente, sostenibilidad, cambio climático, 
+              conservación y cuidado del agua. Conviértete en un agente de cambio 
+              para nuestro planeta desde cualquier lugar.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4">
-              <a href="/cursos"  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-md text-lg font-medium">
+              <Link href="/cursos" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-md text-lg font-medium inline-block text-center">
                 Explorar Cursos
-              </a>
+              </Link>
       
             </div>
           </div>
           <div className="mt-10 lg:mt-0">
-            <img 
+            <Image 
               className="w-full rounded-lg shadow-lg" 
               src="https://images.pexels.com/photos/1462630/pexels-photo-1462630.jpeg" 
-              alt="Estudiante con tablet" 
+              alt="Estudiante aprendiendo sobre medio ambiente"
+              width={600}
+              height={400}
+              priority
             />
           </div>
         </div>

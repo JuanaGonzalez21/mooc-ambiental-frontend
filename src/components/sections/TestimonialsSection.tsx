@@ -9,19 +9,19 @@ const TestimonialsSection = () => {
       id: '1',
       name: 'Laura Sánchez',
       role: 'Desarrolladora Web',
-      content: 'MoocAmbiental cambió mi carrera profesional. Gracias a los cursos de programación, conseguí mi primer empleo como desarrolladora web.',
+      content: 'MoocAmbiental es una increible herramienta para aprender sobre medio ambiente. Gracias a los cursos de recursos hidricos',
     },
     {
       id: '2',
       name: 'Miguel Ángel Pérez',
       role: 'Especialista en Marketing',
-      content: 'La calidad de los cursos es excelente. Los instructores explican todo paso a paso y responden rápidamente a las dudas.',
+      content: 'La calidad de los cursos es excelente. Entendí muchos temas que no conocia y me han ayudado a mejorar mi vida cotidiana.',
     },
     {
       id: '3',
       name: 'Elena Martínez',
       role: 'Analista de Datos',
-      content: 'Lo mejor es la flexibilidad. Puedo estudiar mientras trabajo a tiempo completo, y el contenido siempre está actualizado.',
+      content: 'Lo mejor para estudiar desde casa y a tu propio ritmo.',
     },
   ];
 
