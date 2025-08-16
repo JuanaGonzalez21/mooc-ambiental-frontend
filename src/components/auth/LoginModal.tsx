@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { X, Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { apiRequest } from '@/lib/config';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitchToRegi
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [connectionStatus, setConnectionStatus] = useState<'idle' | 'connecting' | 'success' | 'error'>('idle');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -55,22 +57,24 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitchToRegi
 
     setIsLoading(true);
     setErrors({});
+    setConnectionStatus('connecting');
     
     try {
-      const response = await fetch('http://localhost:3001/api/auth/login', {
+      console.log('🔐 Intentando login con:', { email: formData.email });
+      
+      const data = await apiRequest('/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           email: formData.email,
           password: formData.password
         })
       });
-      
-      const data = await response.json();
 
-      if (data.success) {
+      console.log('✅ Respuesta del login:', data);
+
+      if (data.success && data.token && data.user) {
+        setConnectionStatus('success');
+        
         if (typeof window !== 'undefined') {
           localStorage.setItem('authToken', data.token);
           localStorage.setItem('user', JSON.stringify(data.user));
@@ -80,19 +84,44 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitchToRegi
           }
         }
         
-        handleClose();
-        window.location.href = '/dashboard';
+        console.log('✅ Login exitoso, redirigiendo al dashboard');
+        
+        // Pequeño delay para mostrar el estado de éxito
+        setTimeout(() => {
+          handleClose();
+          if (typeof window !== 'undefined') {
+            window.location.href = '/dashboard';
+          }
+        }, 500);
         
       } else {
+        setConnectionStatus('error');
+        console.warn('⚠️ Login fallido:', data);
         setErrors({ 
-          general: data.error || 'Error al iniciar sesión' 
+          general: data.error || data.message || 'Error al iniciar sesión' 
         });
       }
 
-    } catch (error) {
-      setErrors({ 
-        general: 'Error de conexión. Verifica que el servidor esté funcionando.' 
-      });
+    } catch (error: unknown) {
+      console.error('❌ Error en login:', error);
+      
+      let errorMessage = 'Error de conexión. Verifica que el servidor esté funcionando.';
+      
+      if (typeof error === 'object' && error !== null && 'message' in error) {
+        const message = (error as { message: string }).message;
+        if (message.includes('401')) {
+          errorMessage = 'Credenciales incorrectas. Verifica tu email y contraseña.';
+        } else if (message.includes('500')) {
+          errorMessage = 'Error interno del servidor. Intenta más tarde.';
+        } else if (message.includes('fetch')) {
+          errorMessage = 'No se pudo conectar con el servidor. Verifica tu conexión.';
+        } else if (message.includes('timeout')) {
+          errorMessage = 'La conexión tardó demasiado. Intenta nuevamente.';
+        }
+      }
+      
+      setConnectionStatus('error');
+      setErrors({ general: errorMessage });
     } finally {
       setIsLoading(false);
     }
@@ -102,13 +131,14 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitchToRegi
     setFormData({ email: '', password: '', remember: false });
     setErrors({});
     setShowPassword(false);
+    setConnectionStatus('idle');
     onClose();
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-opacity-80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6">
           <div>
@@ -125,6 +155,21 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitchToRegi
 
         <div className="p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Estado de conexión */}
+            {connectionStatus === 'connecting' && (
+              <div className="bg-blue-50 border border-blue-200 text-blue-600 px-3 py-2 rounded-md text-sm flex items-center">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                Conectando con el servidor...
+              </div>
+            )}
+            
+            {connectionStatus === 'success' && (
+              <div className="bg-green-50 border border-green-200 text-green-600 px-3 py-2 rounded-md text-sm flex items-center">
+                <div className="w-4 h-4 mr-2 text-green-600">✓</div>
+                ¡Login exitoso! Redirigiendo...
+              </div>
+            )}
+
             {errors.general && (
               <div className="bg-red-50 border border-red-200 text-red-600 px-3 py-2 rounded-md text-sm">
                 {errors.general}
@@ -219,18 +264,32 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitchToRegi
 
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || connectionStatus === 'success'}
               className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                isLoading 
+                isLoading || connectionStatus === 'success'
                   ? 'bg-gray-400 cursor-not-allowed' 
+                  : connectionStatus === 'error'
+                  ? 'bg-red-600 hover:bg-red-700'
                   : 'bg-blue-600 hover:bg-blue-700'
               }`}
             >
-              {isLoading ? (
+              {connectionStatus === 'connecting' ? (
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Conectando...
+                </div>
+              ) : connectionStatus === 'success' ? (
+                <div className="flex items-center">
+                  <div className="w-4 h-4 mr-2 text-white">✓</div>
+                  ¡Éxito!
+                </div>
+              ) : isLoading ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   Iniciando sesión...
                 </div>
+              ) : connectionStatus === 'error' ? (
+                'Reintentar'
               ) : (
                 'Iniciar Sesión'
               )}

@@ -1,36 +1,155 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌱 MOOC Ambiental - Plataforma de Educación Ambiental
 
-## Getting Started
+Una plataforma moderna de aprendizaje en línea (MOOC) especializada en educación ambiental y sostenibilidad. Desarrollada con Next.js 15 y React 19, ofrece una experiencia de aprendizaje completa y accesible para estudiantes de todos los niveles.
 
-First, run the development server:
+## 🎯 Objetivo del Proyecto
 
+Democratizar el acceso a la educación ambiental de calidad a través de una plataforma web moderna, permitiendo a usuarios de todo el mundo aprender sobre sostenibilidad, ecología y medio ambiente a su propio ritmo.
+
+## ✨ Características Principales
+
+- 🎓 **Catálogo de Cursos**: Amplia variedad de cursos ambientales organizados por nivel y categoría
+- 👥 **Sistema de Usuarios**: Roles diferenciados (Estudiante, Instructor, Administrador)
+- 📚 **Módulos Interactivos**: Contenido estructurado en módulos para mejor organización
+- ⭐ **Sistema de Calificaciones**: Reseñas y valoraciones de cursos
+- 📱 **Diseño Responsivo**: Interfaz adaptable para dispositivos móviles y desktop
+- 🔐 **Autenticación Segura**: Sistema completo de registro y login con JWT
+- 📊 **Dashboard Personalizado**: Panel de control para estudiantes e instructores
+
+## 🛠️ Tecnologías Utilizadas
+
+### Frontend
+- **Next.js 15** - Framework React con App Router
+- **React 19** - Biblioteca de interfaz de usuario
+- **TypeScript** - Tipado estático para JavaScript
+- **Tailwind CSS v4** - Framework de estilos utilitarios
+- **Lucide React** - Iconografía moderna
+
+### Estado y Formularios
+- **Zustand** - Gestión de estado global
+- **React Hook Form** - Manejo de formularios
+- **Zod** - Validación de esquemas
+
+### Backend y Base de Datos
+- **MySQL2** - Base de datos relacional
+- **Express.js** - Servidor backend
+- **JWT** - Autenticación con tokens
+- **bcrypt** - Encriptación de contraseñas
+
+## 🚀 Instalación y Configuración
+
+### Prerrequisitos
+- Node.js 18+ 
+- npm, yarn, pnpm o bun
+- Base de datos MySQL
+
+### Instalación
+
+1. **Clonar el repositorio**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone [URL_DEL_REPOSITORIO]
+cd mooc-ambiental-frontend
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Instalar dependencias**
+```bash
+npm install
+# o
+yarn install
+# o
+pnpm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Configurar variables de entorno**
+```bash
+# Crear archivo .env.local con las siguientes variables:
+DATABASE_URL="mysql://usuario:contraseña@host:puerto/base_de_datos"
+JWT_SECRET="tu_jwt_secret_key"
+NEXTAUTH_SECRET="tu_nextauth_secret"
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. **Ejecutar el servidor de desarrollo**
+```bash
+npm run dev
+# o
+yarn dev
+# o
+pnpm dev
+```
 
-## Learn More
+5. **Abrir en el navegador**
+Visita [http://localhost:3000](http://localhost:3000) para ver la aplicación.
 
-To learn more about Next.js, take a look at the following resources:
+## 📁 Estructura del Proyecto
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+mooc-ambiental-frontend/
+├── src/
+│   ├── app/                    # App Router de Next.js
+│   │   ├── cursos/            # Páginas de cursos
+│   │   ├── dashboard/         # Panel de usuario
+│   │   └── layout.tsx         # Layout principal
+│   ├── components/            # Componentes reutilizables
+│   │   ├── auth/              # Componentes de autenticación
+│   │   ├── layout/            # Header, Footer
+│   │   ├── sections/          # Secciones de la landing
+│   │   └── ui/                # Componentes de UI
+│   ├── config/                # Configuración de API
+│   ├── data/                  # Adaptadores de datos
+│   ├── lib/                   # Utilidades y configuración
+│   └── types/                 # Definiciones de TypeScript
+├── public/                    # Archivos estáticos
+└── package.json              # Dependencias y scripts
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🎨 Componentes Principales
 
-## Deploy on Vercel
+- **MoocPage**: Página principal con landing page completa
+- **HeroSection**: Sección hero con call-to-action
+- **FeaturedCoursesSection**: Cursos destacados con carga dinámica
+- **CourseCard**: Tarjeta de curso reutilizable
+- **LoginModal/RegisterModal**: Modales de autenticación
+- **Dashboard**: Panel de control personalizado por rol
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🔧 Scripts Disponibles
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run dev      # Servidor de desarrollo
+npm run build    # Construir para producción
+npm run start    # Servidor de producción
+npm run lint     # Linter de código
+```
+
+## 🌐 Despliegue
+
+### Vercel (Recomendado)
+1. Conecta tu repositorio con [Vercel](https://vercel.com)
+2. Configura las variables de entorno en el dashboard
+3. El despliegue se realizará automáticamente
+
+### Otros Proveedores
+- **Netlify**: Compatible con builds estáticos
+- **Railway**: Para aplicaciones full-stack
+- **DigitalOcean**: App Platform
+
+## 🤝 Contribución
+
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## 📝 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+
+## 📞 Contacto
+
+Para preguntas o sugerencias sobre el proyecto, puedes contactarnos a través de:
+- Email: [tu-email@ejemplo.com]
+- Issues: [GitHub Issues](link-to-issues)
+
+---
+
+**Desarrollado con 💚 para la educación ambiental**

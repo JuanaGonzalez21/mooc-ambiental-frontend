@@ -2,26 +2,39 @@
 import { Course } from '@/data/courses';
 import { apiRequest } from '@/lib/config'; // ✅ CAMBIO: @/lib/config en lugar de './config'
 
+// Interfaz para los datos que vienen de la base de datos
+interface DBCourse {
+  course_id?: number;
+  title?: string;
+  instructor_name?: string;
+  duration_hours?: number;
+  level?: 'Principiante' | 'Intermedio' | 'Avanzado';
+  category_name?: string;
+  description?: string;
+  name_course?: string; // Nueva propiedad para la ruta del curso
+}
+
 // Función para convertir datos de BD a formato Course
-export function adaptCourseFromDB(dbCourse: any): Course {
+export function adaptCourseFromDB(dbCourse: DBCourse): Course {
   const baseHours = dbCourse.duration_hours || 20;
   
   return {
     id: dbCourse.course_id?.toString() || '',
     title: dbCourse.title || '',
     instructor: dbCourse.instructor_name || 'Instructor no disponible',
-    rating: calculateRating(dbCourse.course_id, baseHours),
+    rating: calculateRating(dbCourse.course_id || 0, baseHours),
     totalRatings: calculateTotalRatings(baseHours),
     duration: formatDuration(baseHours),
     shortDuration: formatShortDuration(baseHours),
     level: dbCourse.level as 'Principiante' | 'Intermedio' | 'Avanzado' || 'Principiante',
-    originalPrice: calculatePrice(dbCourse.level, baseHours),
-    image: getImageForCategory(dbCourse.category_name),
+    originalPrice: calculatePrice(dbCourse.level || 'Principiante', baseHours),
+    image: getImageForCategory(dbCourse.category_name || 'General'),
     description: dbCourse.description || '',
-    students: calculateStudents(baseHours, dbCourse.level),
+    students: calculateStudents(baseHours, dbCourse.level || 'Principiante'),
     modules: calculateModules(baseHours),
     category: dbCourse.category_name || 'General',
-    tags: generateTags(dbCourse.category_name, dbCourse.level)
+    tags: generateTags(dbCourse.category_name || 'General', dbCourse.level || 'Principiante'),
+    nameRoute: dbCourse.name_course || 'curso-default' // Nueva propiedad para la ruta
   };
 }
 
@@ -40,7 +53,7 @@ function calculateTotalRatings(hours: number): number {
 }
 
 function calculateStudents(hours: number, level: string): number {
-  let base = 1000;
+  let base = 1;
   switch (level) {
     case 'Principiante': base = 8000; break;
     case 'Intermedio': base = 4000; break;
@@ -62,11 +75,7 @@ function calculatePrice(level: string, hours: number): number {
 }
 
 function formatDuration(hours: number): string {
-  if (hours <= 15) return '3-4 semanas';
-  if (hours <= 25) return '5-6 semanas';
-  if (hours <= 35) return '7-8 semanas';
-  if (hours <= 45) return '9-10 semanas';
-  return '10+ semanas';
+  return `${hours} horas`;
 }
 
 function formatShortDuration(hours: number): string {
@@ -74,7 +83,7 @@ function formatShortDuration(hours: number): string {
 }
 
 function calculateModules(hours: number): number {
-  return Math.max(Math.ceil(hours / 3.5), 4);
+  return hours;
 }
 
 function getImageForCategory(categoryName: string): string {
@@ -130,6 +139,20 @@ export async function getCourseFromAPI(courseId: string): Promise<Course | null>
     return null;
   } catch (error) {
     console.error(`❌ Error obteniendo curso ${courseId} de la BD:`, error);
+    throw error;
+  }
+}
+
+export async function getCourseByNameFromAPI(courseName: string): Promise<Course | null> {
+  try {
+    const data = await apiRequest(`/api/courses/by-name/${courseName}`);
+    if (data.success && data.course) {
+      console.log(`✅ Curso ${courseName} cargado desde la BD por nombre`);
+      return adaptCourseFromDB(data.course);
+    }
+    return null;
+  } catch (error) {
+    console.error(`❌ Error obteniendo curso ${courseName} por nombre de la BD:`, error);
     throw error;
   }
 }

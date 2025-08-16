@@ -15,6 +15,7 @@ export interface Course {
   category: string;
   tags: string[];
   shortDuration?: string;
+  nameRoute?: string; // Nueva propiedad para la ruta del curso
 }
 
 // Fallback mínimo SOLO para casos de error de conexión
@@ -34,11 +35,11 @@ const EMERGENCY_FALLBACK: Course[] = [
     students: 0,
     modules: 0,
     category: 'Sistema',
-    tags: ['Error', 'Temporal']
+    tags: ['Error', 'Temporal'],
+    nameRoute: 'error-conexion'
   }
 ];
 
-// ❌ CAMBIO: Importar desde @/data/dataAdapter en lugar de './dataAdapter'
 import { getCoursesFromAPI, getCourseFromAPI } from '@/data/dataAdapter';
 
 // Estas funciones SIEMPRE usan la API

@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from "next/link";
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import { Star, Clock,  BookOpen, Filter, Search, AlertCircle, RefreshCw } from 'lucide-react';
+import { Star, Clock,  BookOpen, Filter, Search, AlertCircle, RefreshCw, PlayCircle } from 'lucide-react';
 import { getAllCourses, Course } from '@/data/courses';
 import { getCategoriesFromAPI, checkDatabaseConnection } from '@/data/dataAdapter';
 
@@ -34,7 +34,7 @@ const CoursesPage = () => {
   };
 
   // Cargar datos desde la base de datos
-  const loadDataFromDatabase = async () => {
+  const loadDataFromDatabase = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -89,12 +89,12 @@ const CoursesPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // Cargar datos al montar el componente
   useEffect(() => {
     loadDataFromDatabase();
-  }, []);
+  }, [loadDataFromDatabase]);
 
   // Filtrar cursos
   const filteredCourses = courses.filter(course => {
@@ -279,25 +279,27 @@ const CoursesPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {loading ? (
             // Loading skeleton
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
-                <div key={index} className="bg-white rounded-xl shadow-lg overflow-hidden animate-pulse">
-                  <div className="h-48 bg-gray-200"></div>
-                  <div className="p-6">
-                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-6 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-3 bg-gray-200 rounded mb-4"></div>
-                    <div className="h-3 bg-gray-200 rounded mb-4 w-3/4"></div>
-                    <div className="flex justify-between">
-                      <div className="h-3 bg-gray-200 rounded w-1/4"></div>
-                      <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                <div key={index} className="bg-white rounded-xl shadow-lg overflow-hidden animate-pulse w-full max-w-[70rem]">
+                  <div className="flex">
+                    <div className="w-64 h-48 bg-gray-200 flex-shrink-0"></div>
+                    <div className="p-6 flex-1">
+                      <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-6 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-3 bg-gray-200 rounded mb-4"></div>
+                      <div className="h-3 bg-gray-200 rounded mb-4 w-3/4"></div>
+                      <div className="flex justify-between">
+                        <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                        <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                      </div>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           ) : !error && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {filteredCourses.length > 0 ? (
                 filteredCourses.map((course) => (
                   <Link
@@ -305,26 +307,27 @@ const CoursesPage = () => {
                     key={course.id}
                     className="block group"
                   >
-                    <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                      {/* Course Image */}
-                      <div className="relative h-48">
-                        <img 
-                          src={course.image} 
-                          alt={course.title}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=250&fit=crop&q=80';
-                          }}
-                        />
-                        <div className="absolute top-4 left-4">
-                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${getLevelColor(course.level)}`}>
-                            {course.level}
-                          </span>
+                    <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group-hover:scale-105 w-full max-w-[70rem]">
+                      <div className="flex flex-col sm:flex-row">
+                        {/* Course Image */}
+                        <div className="relative w-full sm:w-64 h-100 flex-shrink-0">
+                          <img 
+                            src={course.image} 
+                            alt={course.title}
+                            className="w-full h-full object-cover rounded-l-xl"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=250&fit=crop&q=80';
+                            }}
+                          />
+                          <div className="absolute top-4 left-4">
+                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getLevelColor(course.level)}`}>
+                              {course.level}
+                            </span>
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Course Content */}
-                      <div className="p-6">
+                        {/* Course Content */}
+                        <div className="p-6 flex-1">
                         {/* Category */}
                         <div className="text-sm text-blue-600 font-medium mb-2">
                           {course.category}
@@ -377,7 +380,7 @@ const CoursesPage = () => {
                         </div>
 
                         {/* Tags */}
-                        <div className="flex flex-wrap gap-1">
+                        <div className="flex flex-wrap gap-1 mb-4">
                           {course.tags.slice(0, 2).map((tag, index) => (
                             <span 
                               key={index}
@@ -391,6 +394,19 @@ const CoursesPage = () => {
                               +{course.tags.length - 2}
                             </span>
                           )}
+                        </div>
+
+                        {/* Preview Button */}
+                        <div className="pt-2 border-t border-gray-100">
+                          <Link
+                            href={`/cursos/${course.id}/${course.nameRoute || 'curso'}`}
+                            className="text-blue-600 hover:text-blue-800 text-sm font-medium inline-flex items-center"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <PlayCircle className="h-4 w-4 mr-1" />
+                            Vista previa gratuita
+                          </Link>
+                        </div>
                         </div>
                       </div>
                     </div>

@@ -4,17 +4,16 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import RegisterModal from '@/components/auth/RegisterModal';
 import { 
-  Star, 
   Clock, 
-  Users, 
   BookOpen, 
   PlayCircle, 
   CheckCircle, 
   ArrowLeft,
-  Calendar,
   Award,
   Globe
 } from 'lucide-react';
@@ -27,6 +26,7 @@ const CourseDetailPage = () => {
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
 
   useEffect(() => {
     const loadCourse = async () => {
@@ -70,11 +70,26 @@ const CourseDetailPage = () => {
   };
 
   const handleRegister = () => {
-    // Aquí puedes redirigir a tu página de registro o abrir un modal
-    // Por ejemplo: router.push('/registro?curso=' + courseId);
-    alert('Redirigiendo a registro del curso...');
-    // En una implementación real, esto sería:
-    // window.location.href = '/registro?curso=' + courseId;
+    // Si el usuario ya está logueado, ir directo al curso usando la nueva estructura
+    const user = localStorage.getItem('user');
+    if (user && course?.nameRoute && course?.id) {
+      window.location.href = `/cursos/${course.id}/${course.nameRoute}`;
+    } else if (user && course?.id) {
+      // Fallback si no hay nameRoute
+      window.location.href = `/cursos/${course.id}/curso`;
+    } else {
+      // Si no está logueado, abrir modal de registro
+      setIsRegisterOpen(true);
+    }
+  };
+
+  const closeRegisterModal = () => {
+    setIsRegisterOpen(false);
+  };
+
+  const handleSwitchToLogin = () => {
+    // Por ahora solo cerramos el modal, pero podrías abrir LoginModal aquí
+    setIsRegisterOpen(false);
   };
 
   if (loading) {
@@ -154,8 +169,8 @@ const CourseDetailPage = () => {
       {/* Course Hero */}
       <section className="bg-gradient-to-r from-blue-900 to-green-900 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
+            <div className="lg:col-span-2">
               <div className="flex items-center space-x-4 mb-4">
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${getLevelColor(course.level)}`}>
                   {course.level}
@@ -180,43 +195,35 @@ const CourseDetailPage = () => {
                   <BookOpen className="h-5 w-5 mr-2" />
                   {course.modules} módulos
                 </div>
-                <div className="flex items-center">
-                  <Users className="h-5 w-5 mr-2" />
-                  {course.students.toLocaleString()} estudiantes
-                </div>
+
               </div>
-              
-              <div className="flex items-center mb-8">
-                <div className="flex text-yellow-400 mr-3">
-                  {[...Array(5)].map((_, i) => (
-                    <Star 
-                      key={i} 
-                      className={`h-5 w-5 ${i < Math.floor(course.rating) ? 'fill-current' : ''}`} 
-                    />
-                  ))}
-                </div>
-                <span className="text-white text-lg font-medium mr-2">
-                  {course.rating}
-                </span>
-                <span className="text-blue-200">
-                  ({course.totalRatings.toLocaleString()} reseñas)
-                </span>
+                          
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button
+                  onClick={handleRegister}
+                  className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-colors inline-flex items-center justify-center"
+                >
+                  <PlayCircle className="h-6 w-6 mr-3" />
+                  Registrarme para este curso
+                </button>
+                
+                <Link
+                  href={`/cursos/${course.id}/${course.nameRoute || 'curso'}`}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-colors inline-flex items-center justify-center"
+                >
+                  <PlayCircle className="h-6 w-6 mr-3" />
+                  Ver parte inicial del curso
+                </Link>
               </div>
-              
-              <button
-                onClick={handleRegister}
-                className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-colors inline-flex items-center"
-              >
-                <PlayCircle className="h-6 w-6 mr-3" />
-                Registrarme para este curso
-              </button>
             </div>
             
-            <div className="lg:justify-self-end">
+            <div className="lg:col-span-1">
               <div className="relative">
-                <img 
+                <Image 
                   src={course.image} 
                   alt={course.title}
+                  width={400}
+                  height={300}
                   className="w-full max-w-md rounded-xl shadow-2xl"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-20 rounded-xl"></div>
@@ -320,13 +327,6 @@ const CourseDetailPage = () => {
                     <span className="font-medium text-gray-900">{course.modules}</span>
                   </div>
                   
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <Users className="h-5 w-5 text-gray-400 mr-3" />
-                      <span className="text-gray-600">Estudiantes</span>
-                    </div>
-                    <span className="font-medium text-gray-900">{course.students.toLocaleString()}</span>
-                  </div>
                   
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
@@ -371,6 +371,14 @@ const CourseDetailPage = () => {
       </section>
 
       <Footer />
+      
+      {/* Register Modal */}
+      <RegisterModal
+        isOpen={isRegisterOpen}
+        onClose={closeRegisterModal}
+        onSwitchToLogin={handleSwitchToLogin}
+        redirectTo={course?.nameRoute && course?.id ? `/cursos/${course.id}/${course.nameRoute}` : '/curso-mooc'}
+      />
     </div>
   );
 };

@@ -9,9 +9,10 @@ interface RegisterModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSwitchToLogin: () => void;
+  redirectTo?: string; // Nueva prop opcional para redirección personalizada
 }
 
-const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitchToLogin }) => {
+const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitchToLogin, redirectTo }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -112,8 +113,8 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitch
         // Cerrar modal
         handleClose();
         
-        // Redirigir al dashboard
-        window.location.href = '/dashboard';
+        // Redirigir a la URL personalizada o al dashboard por defecto
+        window.location.href = redirectTo || '/dashboard';
       } else {
         console.error('❌ Error en el registro:', data.error);
         setErrors({ general: data.error || 'Error al crear la cuenta' });
@@ -146,7 +147,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitch
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-opacity-80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[95vh] overflow-y-auto">
         {/* Header del modal */}
         <div className="flex items-center justify-between p-6">
