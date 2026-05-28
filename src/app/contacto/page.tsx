@@ -66,7 +66,7 @@ const ContactPage = () => {
           </h1>
           <p className="text-lg sm:text-xl text-blue-100 max-w-3xl mx-auto">
             ¿Tienes preguntas sobre el desarrollo de esta plataforma? ¿Necesitas ayuda técnica? 
-            Estoy aquí para ayudarte en tu journey de aprendizaje .
+            Estoy aquí para ayudarte en tu camino de aprendizaje .
           </p>
         </div>
       </section>
@@ -226,7 +226,7 @@ const ContactPage = () => {
                   </div>
                   <div>
                     <h4 className="font-medium text-gray-900">Teléfono</h4>
-                    <p className="text-gray-600">+57 319714623</p>
+                    <p className="text-gray-600">+57 3197414623</p>
                   </div>
                 </div>
 
@@ -296,14 +296,18 @@ const ContactPage = () => {
                   <h5 className="font-medium text-gray-900 mb-3">Conecta conmigo</h5>
                   <div className="flex space-x-4">
                     <a
-                      href="#"
+                      href="https://github.com/JuanaGonzalez21"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="flex items-center justify-center w-10 h-10 bg-gray-800 text-white rounded-full hover:bg-gray-700 transition-colors"
                       title="GitHub"
                     >
                       <Github className="h-5 w-5" />
                     </a>
                     <a
-                      href="#"
+                      href="https://www.linkedin.com/in/juanagonzalezardila/"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="flex items-center justify-center w-10 h-10 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
                       title="LinkedIn"
                     >
