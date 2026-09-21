@@ -85,21 +85,12 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitch
     setErrors({});
     
     try {
-      console.log('🚀 Iniciando registro...', {
-        name: formData.name.trim(),
-        email: formData.email,
-        role: formData.role
-      });
-
-      // ✅ USAR LA FUNCIÓN registerAPI
       const data = await registerAPI(
         formData.name.trim(),
         formData.email,
         formData.password,
         formData.role
       );
-
-      console.log('✅ Respuesta del registro:', data);
 
       if (data.success) {
         // Guardar datos del usuario y token
@@ -108,21 +99,17 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitch
           localStorage.setItem('user', JSON.stringify(data.user));
         }
 
-        console.log('✅ Usuario registrado exitosamente');
-        
         // Cerrar modal
         handleClose();
-        
+
         // Redirigir a la URL personalizada o al dashboard por defecto
         window.location.href = redirectTo || '/dashboard';
       } else {
-        console.error('❌ Error en el registro:', data.error);
         setErrors({ general: data.error || 'Error al crear la cuenta' });
       }
-    } catch (error) {
-      console.error('❌ Error en registro:', error);
-      setErrors({ 
-        general: 'Error de conexión. Verifica que el servidor esté funcionando.' 
+    } catch {
+      setErrors({
+        general: 'Error de conexión. Verifica que el servidor esté funcionando.'
       });
     } finally {
       setIsLoading(false);
@@ -246,7 +233,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitch
                   }`}
                 >
                   <option value="STUDENT">Estudiante</option>
-                  <option value="INSTRUCTOR">Instructor</option>
+                  <option value="INSTRUCTOR" disabled>Instructor (Próximamente)</option>
                 </select>
               </div>
             </div>

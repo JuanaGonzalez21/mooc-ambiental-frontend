@@ -47,8 +47,7 @@ export const getFeaturedCourses = async (): Promise<Course[]> => {
   try {
     const courses = await getCoursesFromAPI();
     return courses.slice(0, 3);
-  } catch (error) {
-    console.error('❌ Error obteniendo cursos destacados:', error);
+  } catch {
     return EMERGENCY_FALLBACK.slice(0, 3);
   }
 };
@@ -57,8 +56,7 @@ export const getAllCourses = async (): Promise<Course[]> => {
   try {
     const courses = await getCoursesFromAPI();
     return courses.length > 0 ? courses : EMERGENCY_FALLBACK;
-  } catch (error) {
-    console.error('❌ Error obteniendo todos los cursos:', error);
+  } catch {
     return EMERGENCY_FALLBACK;
   }
 };
@@ -67,8 +65,7 @@ export const getCourseById = async (id: string): Promise<Course | undefined> => 
   try {
     const course = await getCourseFromAPI(id);
     return course || undefined;
-  } catch (error) {
-    console.error('❌ Error obteniendo curso por ID:', error);
+  } catch {
     return undefined;
   }
 };

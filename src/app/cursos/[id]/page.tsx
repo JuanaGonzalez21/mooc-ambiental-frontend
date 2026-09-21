@@ -49,8 +49,7 @@ const CourseDetailPage = () => {
         
         setCourse(courseData);
         
-      } catch (err) {
-        console.error('Error cargando curso:', err);
+      } catch {
         setError('Error al cargar el curso. Por favor, intenta nuevamente.');
       } finally {
         setLoading(false);

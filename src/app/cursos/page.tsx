@@ -26,8 +26,7 @@ const CoursesPage = () => {
       const isConnected = await checkDatabaseConnection();
       setConnectionStatus(isConnected ? 'connected' : 'disconnected');
       return isConnected;
-    } catch (error) {
-      console.error('Error verificando conexión:', error);
+    } catch {
       setConnectionStatus('disconnected');
       return false;
     }
@@ -38,9 +37,7 @@ const CoursesPage = () => {
     try {
       setLoading(true);
       setError(null);
-      
-      console.log('🔍 Cargando datos desde la base de datos...');
-      
+
       // Verificar conexión
       const isConnected = await checkConnection();
       if (!isConnected) {
@@ -50,14 +47,9 @@ const CoursesPage = () => {
       // Cargar cursos y categorías en paralelo
       const [coursesData, categoriesData] = await Promise.all([
         getAllCourses(),
-        getCategoriesFromAPI().catch(err => {
-          console.warn('⚠️ Error cargando categorías:', err);
-          return [];
-        })
+        getCategoriesFromAPI().catch(() => [])
       ]);
-      
-      console.log(`✅ Datos cargados exitosamente: ${coursesData.length} cursos, ${categoriesData.length} categorías`);
-      
+
       setCourses(coursesData);
       setCategories([{ name: 'Todos' }, ...categoriesData]);
       
@@ -66,8 +58,6 @@ const CoursesPage = () => {
       }
       
     } catch (error: unknown) {
-      console.error('❌ Error cargando datos:', error);
-      
       let errorMessage = 'Error al cargar los cursos desde la base de datos.';
       
       if (typeof error === 'object' && error !== null && 'message' in error && typeof (error as { message: unknown }).message === 'string') {

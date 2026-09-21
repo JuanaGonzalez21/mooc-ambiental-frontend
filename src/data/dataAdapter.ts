@@ -116,99 +116,56 @@ function generateTags(categoryName: string, level: string): string[] {
 
 // FUNCIONES DE API
 export async function getCoursesFromAPI(): Promise<Course[]> {
-  try {
-    const data = await apiRequest('/api/courses');
-    if (data.success && data.courses) {
-      console.log(`✅ Cargados ${data.courses.length} cursos desde la BD`);
-      return data.courses.map(adaptCourseFromDB);
-    }
-    throw new Error('No se recibieron cursos válidos de la API');
-  } catch (error) {
-    console.error('❌ Error obteniendo cursos de la BD:', error);
-    throw error;
+  const data = await apiRequest('/api/courses');
+  if (data.success && data.courses) {
+    return data.courses.map(adaptCourseFromDB);
   }
+  throw new Error('No se recibieron cursos válidos de la API');
 }
 
 export async function getCourseFromAPI(courseId: string): Promise<Course | null> {
-  try {
-    const data = await apiRequest(`/api/courses/${courseId}`);
-    if (data.success && data.course) {
-      console.log(`✅ Curso ${courseId} cargado desde la BD`);
-      return adaptCourseFromDB(data.course);
-    }
-    return null;
-  } catch (error) {
-    console.error(`❌ Error obteniendo curso ${courseId} de la BD:`, error);
-    throw error;
+  const data = await apiRequest(`/api/courses/${courseId}`);
+  if (data.success && data.course) {
+    return adaptCourseFromDB(data.course);
   }
+  return null;
 }
 
 export async function getCourseByNameFromAPI(courseName: string): Promise<Course | null> {
-  try {
-    const data = await apiRequest(`/api/courses/by-name/${courseName}`);
-    if (data.success && data.course) {
-      console.log(`✅ Curso ${courseName} cargado desde la BD por nombre`);
-      return adaptCourseFromDB(data.course);
-    }
-    return null;
-  } catch (error) {
-    console.error(`❌ Error obteniendo curso ${courseName} por nombre de la BD:`, error);
-    throw error;
+  const data = await apiRequest(`/api/courses/by-name/${courseName}`);
+  if (data.success && data.course) {
+    return adaptCourseFromDB(data.course);
   }
+  return null;
 }
 
 export async function getCategoriesFromAPI() {
-  try {
-    const data = await apiRequest('/api/categories');
-    if (data.success && data.categories) {
-      console.log(`✅ Cargadas ${data.categories.length} categorías desde la BD`);
-      return data.categories;
-    }
-    throw new Error('No se recibieron categorías válidas de la API');
-  } catch (error) {
-    console.error('❌ Error obteniendo categorías de la BD:', error);
-    throw error;
+  const data = await apiRequest('/api/categories');
+  if (data.success && data.categories) {
+    return data.categories;
   }
+  throw new Error('No se recibieron categorías válidas de la API');
 }
 
 export async function loginAPI(email: string, password: string) {
-  try {
-    const data = await apiRequest('/api/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, password })
-    });
-    if (data.success) {
-      console.log('✅ Login exitoso desde la BD');
-    }
-    return data;
-  } catch (error) {
-    console.error('❌ Error en login:', error);
-    throw error;
-  }
+  return apiRequest('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email, password })
+  });
 }
 
 export async function registerAPI(name: string, email: string, password: string, role: string = 'STUDENT') {
-  try {
-    const data = await apiRequest('/api/auth/register', {
-      method: 'POST',
-      body: JSON.stringify({ name, email, password, role })
-    });
-    if (data.success) {
-      console.log('✅ Registro exitoso en la BD');
-    }
-    return data;
-  } catch (error) {
-    console.error('❌ Error en registro:', error);
-    throw error;
-  }
+  return apiRequest('/api/auth/register', {
+    method: 'POST',
+    body: JSON.stringify({ name, email, password, role })
+  });
 }
 
 export async function checkDatabaseConnection(): Promise<boolean> {
   try {
     await apiRequest('/api/test');
     return true;
-  } catch (error) {
-    console.error('❌ Sin conexión a la base de datos:', error);
+  } catch {
     return false;
   }
 }

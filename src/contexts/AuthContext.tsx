@@ -2,6 +2,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { apiRequest } from '@/lib/config';
 
 interface User {
   id: string;
@@ -44,26 +45,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Verificar token con el servidor
   const verifyTokenWithServer = async (token: string): Promise<User | null> => {
     try {
-      console.log('🔐 Verificando token con el servidor...');
-      const response = await fetch('/api/auth/verify', {
+      const data = await apiRequest('/api/auth/verify', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ token })
       });
 
-      const data = await response.json();
-      
-      if (data.success && data.user) {
-        console.log('✅ Token válido, usuario autenticado');
+      if (data?.success && data.user) {
         return data.user;
-      } else {
-        console.log('❌ Token inválido o expirado');
-        return null;
       }
-    } catch (error) {
-      console.error('❌ Error verificando token:', error);
+      return null;
+    } catch {
       return null;
     }
   };
@@ -78,31 +69,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
 
         const storedUser = localStorage.getItem('user');
-        const storedToken = localStorage.getItem('authToken') || localStorage.getItem('token');
+        const storedToken = localStorage.getItem('authToken');
 
         if (storedUser && storedToken) {
-          // Verificar token con servidor
+          // Verificar token con servidor; si falla, la sesión no es válida
           const serverUser = await verifyTokenWithServer(storedToken);
-          
+
           if (serverUser) {
-            // Usar datos del servidor
             setUser(serverUser);
             localStorage.setItem('user', JSON.stringify(serverUser));
-            console.log('✅ Usuario cargado desde servidor');
           } else {
-            // Usar datos locales como fallback
-            try {
-              const localUser = JSON.parse(storedUser);
-              setUser(localUser);
-              console.log('📱 Usuario cargado desde localStorage');
-            } catch (error) {
-              console.error('❌ Error parseando usuario local:', error);
-              logout();
-            }
+            logout();
           }
         }
-      } catch (error) {
-        console.error('❌ Error cargando usuario:', error);
+      } catch {
+        logout();
       } finally {
         setIsLoading(false);
       }
@@ -116,14 +97,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!user) return;
 
     const keepSessionAlive = async () => {
-      const storedToken = localStorage.getItem('authToken') || localStorage.getItem('token');
+      const storedToken = localStorage.getItem('authToken');
       if (storedToken) {
         const serverUser = await verifyTokenWithServer(storedToken);
         if (serverUser) {
           setUser(serverUser);
           localStorage.setItem('user', JSON.stringify(serverUser));
         } else {
-          console.log('❌ Sesión expirada');
           logout();
         }
       }
@@ -149,7 +129,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('authToken', token);
-    console.log('✅ Usuario logueado:', userData);
   };
 
   const logout = () => {
@@ -158,7 +137,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('authToken');
     localStorage.removeItem('rememberUser');
-    console.log('🚪 Usuario deslogueado');
   };
 
   const updateUser = (userData: User) => {

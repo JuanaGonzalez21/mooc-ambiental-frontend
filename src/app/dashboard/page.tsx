@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { getUserProgressFromAPI, getCoursesFromAPI } from '@/data/dataAdapter';
 import { getImageForCategory } from '@/data/dataAdapter';
 import { Course } from '@/data/courses';
+import { apiRequest } from '@/lib/config';
 
 // Interfaces para el progreso del usuario
 interface UserProgressStats {
@@ -94,28 +95,25 @@ const StudentDashboard = () => {
   // Verificar token con el servidor
   const verifyTokenWithServer = async (token: string) => {
     try {
-      console.log('🔐 Verificando token con el servidor...');
-      const response = await fetch('/api/auth/verify', {
+      const data = await apiRequest('/api/auth/verify', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ token })
       });
 
-      const data = await response.json();
-      
-      if (data.success && data.user) {
-        console.log('✅ Token válido, usuario actualizado desde servidor');
+      if (data?.success && data.user) {
         return data.user;
-      } else {
-        console.log('❌ Token inválido o expirado');
-        return null;
       }
-    } catch (error) {
-      console.error('❌ Error verificando token:', error);
+      return null;
+    } catch {
       return null;
     }
+  };
+
+  const clearSessionAndRedirect = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('authToken');
+    window.location.href = '/';
   };
 
   // Obtener datos reales del usuario logueado
@@ -128,79 +126,38 @@ const StudentDashboard = () => {
           return;
         }
 
-        console.log('🔍 Verificando autenticación...');
-        
-        // Debug: Mostrar todo lo que hay en localStorage
-        console.log('🗂️ Contenido completo de localStorage:');
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (key) {
-            const value = localStorage.getItem(key);
-            console.log(`  ${key}:`, value?.substring(0, 100) + (value && value.length > 100 ? '...' : ''));
-          }
-        }
-        
         const storedUser = localStorage.getItem('user');
-        const storedToken = localStorage.getItem('authToken') || localStorage.getItem('token');
-        
-        console.log('📦 Usuario en localStorage:', storedUser ? 'Encontrado' : 'No encontrado');
-        console.log('🔑 Token en localStorage:', storedToken ? 'Encontrado' : 'No encontrado');
-        
+        const storedToken = localStorage.getItem('authToken');
+
         if (storedUser && storedToken) {
-          // Primero intentar verificar el token con el servidor
+          // Verificar el token con el servidor; si no es válido, cerrar sesión
           const serverUser = await verifyTokenWithServer(storedToken);
-          
-          let user;
-          if (serverUser) {
-            // Si el servidor devuelve datos actualizados, usarlos
-            user = serverUser;
-            // Actualizar localStorage con datos frescos
-            localStorage.setItem('user', JSON.stringify(serverUser));
-            console.log('🔄 Datos de usuario actualizados desde servidor');
-          } else {
-            // Si el servidor no responde o el token es inválido, usar datos locales como fallback
-            try {
-              user = JSON.parse(storedUser);
-              console.log('📱 Usando datos locales como fallback');
-            } catch (parseError) {
-              console.error('❌ Error parseando usuario local:', parseError);
-              // Limpiar datos corruptos
-              localStorage.removeItem('user');
-              localStorage.removeItem('token');
-              localStorage.removeItem('authToken');
-              setTimeout(() => {
-                window.location.href = '/';
-              }, 1000);
-              return;
-            }
+
+          if (!serverUser) {
+            clearSessionAndRedirect();
+            return;
           }
 
-          console.log('🔍 Datos del usuario recibidos:', user);
-          console.log('📝 firstName:', user.firstName);
-          console.log('📝 lastName:', user.lastName);
-          console.log('📝 first_name:', user.first_name);
-          console.log('📝 last_name:', user.last_name);
-          
+          const user = serverUser;
+          localStorage.setItem('user', JSON.stringify(serverUser));
+
           const fullName = `${user.firstName || user.first_name || ''} ${user.lastName || user.last_name || ''}`.trim() || 'Usuario';
-          console.log('✅ Nombre completo construido:', fullName);
-          
-                    // Cargar progreso real del usuario
+
+          // Cargar progreso real del usuario
           let progressData = null;
           try {
             progressData = await getUserProgressFromAPI(user.id || user.user_id);
             setUserProgress(progressData);
-            console.log('📊 Progreso del usuario cargado:', progressData);
-          } catch (progressError) {
-            console.warn('⚠️ No se pudo cargar el progreso del usuario:', progressError);
+          } catch {
+            // El progreso es opcional; el dashboard sigue funcionando sin él
           }
 
           // Cargar todos los cursos disponibles
           try {
             const coursesData = await getCoursesFromAPI();
             setAllCourses(coursesData);
-            console.log('📚 Todos los cursos cargados:', coursesData.length);
-          } catch (coursesError) {
-            console.warn('⚠️ No se pudieron cargar los cursos:', coursesError);
+          } catch {
+            // Los cursos son opcionales; el dashboard sigue funcionando sin ellos
           }
 
           // Usar datos reales de progreso si están disponibles
@@ -215,16 +172,13 @@ const StudentDashboard = () => {
             certificates: stats.completed_lessons || 0,
             currentStreak: 7 // Este podría calcularse basado en completed_at
           });
-          console.log('🎉 Dashboard cargado para:', fullName);
         } else {
-          console.log('🚫 No hay datos de autenticación, redirigiendo...');
           // Dar un pequeño delay para evitar redirecciones inmediatas
           setTimeout(() => {
             window.location.href = '/';
           }, 1000);
         }
-      } catch (error) {
-        console.error('❌ Error general cargando datos del usuario:', error);
+      } catch {
         setTimeout(() => {
           window.location.href = '/';
         }, 1000);
@@ -243,16 +197,12 @@ const StudentDashboard = () => {
     if (!userData) return;
 
     const keepSessionAlive = async () => {
-      const storedToken = localStorage.getItem('authToken') || localStorage.getItem('token');
+      const storedToken = localStorage.getItem('authToken');
       if (storedToken) {
-        console.log('🔄 Renovando sesión...');
         const serverUser = await verifyTokenWithServer(storedToken);
         if (serverUser) {
-          console.log('✅ Sesión renovada exitosamente');
-          // Actualizar datos si es necesario
           localStorage.setItem('user', JSON.stringify(serverUser));
         } else {
-          console.log('❌ Sesión expirada, redirigiendo al login');
           localStorage.clear();
           window.location.href = '/';
         }
@@ -264,7 +214,6 @@ const StudentDashboard = () => {
 
     // También verificar cuando la página vuelve a tener foco
     const handleFocus = () => {
-      console.log('👁️ Página enfocada, verificando sesión...');
       keepSessionAlive();
     };
 
@@ -852,9 +801,8 @@ const StudentDashboard = () => {
                 
                 <hr className="my-4" />
                 
-                <button 
+                <button
                   onClick={() => {
-                    console.log('🚪 Cerrando sesión...');
                     localStorage.removeItem('user');
                     localStorage.removeItem('token');
                     localStorage.removeItem('authToken');

@@ -90,8 +90,8 @@ const CourseContentPage = () => {
         if (courseName) {
           try {
             courseData = await getCourseByNameFromAPI(courseName);
-          } catch (err) {
-            console.warn('No se pudo cargar por nombre, intentando por ID:', err);
+          } catch {
+            // Se reintenta por ID a continuación
           }
         }
         
@@ -119,8 +119,7 @@ const CourseContentPage = () => {
           setIsEnrolled(true);
         }
         
-      } catch (err) {
-        console.error('Error cargando curso:', err);
+      } catch {
         setError('Error al cargar el curso. Por favor, intenta nuevamente.');
       } finally {
         setLoading(false);

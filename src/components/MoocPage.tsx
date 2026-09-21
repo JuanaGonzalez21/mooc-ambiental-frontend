@@ -3,7 +3,7 @@ import React from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import HeroSection from '@/components/sections/HeroSection';
-import FeaturedCoursesSection from '@/components/sections/FeaturedCoursesSection.tsx';
+import FeaturedCoursesSection from '@/components/sections/FeaturedCoursesSection';
 import WhyChooseUsSection from '@/components/sections/WhyChooseUsSection';
 import TestimonialsSection from '@/components/sections/TestimonialsSection';
 import CTASection from '@/components/sections/CTASection';

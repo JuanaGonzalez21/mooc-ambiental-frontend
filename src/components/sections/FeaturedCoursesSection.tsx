@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Star, Clock, Users, BookOpen, ArrowRight } from 'lucide-react';
+import { Clock, BookOpen, ArrowRight } from 'lucide-react';
 import { getFeaturedCourses, Course } from '@/data/courses';
 
 const FeaturedCoursesSection: React.FC = () => {
@@ -19,8 +19,7 @@ const FeaturedCoursesSection: React.FC = () => {
         const featuredCourses = await getFeaturedCourses();
         setCourses(featuredCourses);
         
-      } catch (err) {
-        console.error('Error cargando cursos:', err);
+      } catch {
         setCourses([]); // Array vacío si hay error
       } finally {
         setLoading(false);

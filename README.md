@@ -25,29 +25,21 @@ Democratizar el acceso a la educación ambiental de calidad a través de una pla
 - **Tailwind CSS v4** - Framework de estilos utilitarios
 - **Lucide React** - Iconografía moderna
 
-### Estado y Formularios
-- **Zustand** - Gestión de estado global
-- **React Hook Form** - Manejo de formularios
-- **Zod** - Validación de esquemas
-
-### Backend y Base de Datos
-- **MySQL2** - Base de datos relacional
-- **Express.js** - Servidor backend
-- **JWT** - Autenticación con tokens
-- **bcrypt** - Encriptación de contraseñas
+### Backend
+El backend (API REST, base de datos MySQL y autenticación JWT) vive en un repositorio y despliegue aparte (Railway). Este frontend solo lo consume vía `NEXT_PUBLIC_API_URL`.
 
 ## 🚀 Instalación y Configuración
 
 ### Prerrequisitos
 - Node.js 18+ 
 - npm, yarn, pnpm o bun
-- Base de datos MySQL
+- El backend de MOOC Ambiental corriendo (local o desplegado)
 
 ### Instalación
 
 1. **Clonar el repositorio**
 ```bash
-git clone [URL_DEL_REPOSITORIO]
+git clone https://github.com/JuanaGonzalez21/mooc-ambiental-frontend.git
 cd mooc-ambiental-frontend
 ```
 
@@ -62,10 +54,8 @@ pnpm install
 
 3. **Configurar variables de entorno**
 ```bash
-# Crear archivo .env.local con las siguientes variables:
-DATABASE_URL="mysql://usuario:contraseña@host:puerto/base_de_datos"
-JWT_SECRET="tu_jwt_secret_key"
-NEXTAUTH_SECRET="tu_nextauth_secret"
+# Crear archivo .env.local con la siguiente variable:
+NEXT_PUBLIC_API_URL="http://localhost:3001"
 ```
 
 4. **Ejecutar el servidor de desarrollo**
@@ -147,8 +137,8 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 ## 📞 Contacto
 
 Para preguntas o sugerencias sobre el proyecto, puedes contactarnos a través de:
-- Email: [tu-email@ejemplo.com]
-- Issues: [GitHub Issues](link-to-issues)
+- Email: juana.gonzalez.dev@gmail.com
+- Issues: [GitHub Issues](https://github.com/JuanaGonzalez21/mooc-ambiental-frontend/issues)
 
 ---
 

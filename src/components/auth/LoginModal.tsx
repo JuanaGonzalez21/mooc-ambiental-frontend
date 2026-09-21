@@ -62,8 +62,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitchToRegi
     setConnectionStatus('connecting');
     
     try {
-      console.log('🔐 Intentando login con:', { email: formData.email });
-      
       const data = await apiRequest('/api/auth/login', {
         method: 'POST',
         body: JSON.stringify({
@@ -71,8 +69,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitchToRegi
           password: formData.password
         })
       });
-
-      console.log('✅ Respuesta del login:', data);
 
       if (data.success && data.token && data.user) {
         setConnectionStatus('success');
@@ -83,9 +79,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitchToRegi
         if (formData.remember && typeof window !== 'undefined') {
           localStorage.setItem('rememberUser', 'true');
         }
-        
-        console.log('✅ Login exitoso, redirigiendo al dashboard');
-        
+
         // Pequeño delay para mostrar el estado de éxito
         setTimeout(() => {
           handleClose();
@@ -96,15 +90,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitchToRegi
         
       } else {
         setConnectionStatus('error');
-        console.warn('⚠️ Login fallido:', data);
-        setErrors({ 
-          general: data.error || data.message || 'Error al iniciar sesión' 
+        setErrors({
+          general: data.error || data.message || 'Error al iniciar sesión'
         });
       }
 
     } catch (error: unknown) {
-      console.error('❌ Error en login:', error);
-      
       let errorMessage = 'Error de conexión. Verifica que el servidor esté funcionando.';
       
       if (typeof error === 'object' && error !== null && 'message' in error) {
